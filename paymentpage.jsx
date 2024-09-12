@@ -128,6 +128,10 @@ const PaymentCardComponent = ({
     );
   };
 
+
+// LIFI WIDGET IMPLEMENTATION STARTS HERE 
+
+
   const contractCalls = []; // Contract calls for LiFi widget (if any)
 
   // Contract tool configuration for LiFi widget
@@ -273,21 +277,45 @@ const PaymentCardComponent = ({
           />
         </div>
 
-        {/* LiFi widget toggle */}
+
+
+        {/* LiFi widget toggle section */}
+        {coin?.lifi && (     // checking if the coin object has lifi boolean to be true 
         <div className="LiFiWidgetToggle">
-          <button className="LiFiButton" onClick={handleBtnClick}>
-            {showWidget ? "Hide LiFi Widget" : "Show LiFi Widget"}
-          </button>
-          {showWidget && (
-            <LiFiWidget
-              integrator={"Evouchr"}
-              initialChains={[ChainType.EVM]}
-              coin={coin}
-              config={widgetConfig} // Pass widget configuration
-              contractCalls={contractCalls}
+            {/* Toggle button to show/hide the LiFi widget */}
+            {!showWidget && (
+            <button className="LiFiButton" onClick={handleBtnClick}>
+                Show LiFi Widget  {/* Button to show the widget */}
+            </button>
+            )}
+
+            {/* Conditional rendering of the LiFi widget based on toggle state */}
+            {showWidget && (
+            <>
+            {/* LIFI Widget Integrated here with ITEM Price */}
+               <LiFiWidget
+                contractComponent={
+                <ItemPrice
+                  token={{
+                    chainId: coin.chainId,    //chainId of the coin which is selected by user for example: 1 
+                    address: coin.lifiToken,  // Token address of the coin which is selected by the user for example : 0x58efE15C0404aB22F87E4495D71f6f2077e862bE 
+                    symbol: coin.currency,   // Name of the the coin which is selected by the user : USDT
+                    name: coin.currency,    // Name of the the coin which is selected by the user : USDT
+                    // decimals: 6,       
+                    amount: BigInt(Math.round(payAmount * 1000000)),   // The Amount that user is supposed to pay for example the payAmount could be : 19.16
+                    logoURI: coin.webImage,   // The Logo url of the coin selected 
+                  }}
+                  contractCalls={contractCalls}    // We are passing empty array here for contract calls 
+                />
+              }
+              contractTool={contractTool}  // contract tool configuration as defined in line No : 138
+              config={widgetConfig}    // widget configuration as defined in line No : 145
+              integrator={widgetConfig.integrator}   // Integrator from widget configuration as defined in line No : 145
             />
-          )}
+            </>
+            )}
         </div>
+        )}
       </div>
     </>
   );
